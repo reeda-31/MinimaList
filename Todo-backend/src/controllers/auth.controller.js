@@ -1,11 +1,12 @@
-import User from "../models/User.model.js"
+import {User} from "../models/User.model.js"
 import {uploadFile} from "../lib/cloudinary.js"
 import bcrypt from "bcrypt"
 import { generateTokenAndSetCookie } from "../lib/token.js"
 import { ApiError } from "../lib/ApiError.js"
 import {ApiResponse} from "../lib/ApiResponse.js"
 import {asyncHandler} from "../lib/asyncHandler.js"
-import { MAX_EMAIL_LENGTH,PASSWORD_LENGTH } from "../lib/CONFIG.JS"
+import { MAX_EMAIL_LENGTH, PASSWORD_LENGTH, FOLDER_NAME } 
+from "../lib/configuration.js";
 
 /*
 1.REGISTER USER :
@@ -45,21 +46,23 @@ const registerUser=asyncHandler(async (req,res)=>{
         $or:[{username},{email}]
     })
     if(existingUser){
-        throw new ApiError(409,"User alread exists")
+        throw new ApiError(400,"User already exists")
     }
 
+    // console.log(avatarLocalPath)
+    
+    let avatar
     if(avatarLocalPath){
         const avatarUploadResponse= await uploadFile(avatarLocalPath,
             `${FOLDER_NAME}`
         )
+        // console.log("Response:",avatarUploadResponse)
         if(!avatarUploadResponse?.secure_url){
             throw new ApiError(500,"Failed to upload Avatar.")
         }
-        avatar={
-            public_id: avatarUploadResponse.public_id,
-            url:avatarUploadResponse.url
-        }
-    }else{
+        avatar=avatarUploadResponse.url
+            }
+            else{
         avatar={
             public_id: null,
             url:`${process.env.BASE_URL}/image.png`
@@ -68,7 +71,7 @@ const registerUser=asyncHandler(async (req,res)=>{
 
     const hashedPassword=await bcrypt.hash(password,10)
 
-    const newUser= User.create({
+    const newUser= await User.create({
         email,
         username,
         password:hashedPassword,
@@ -101,6 +104,7 @@ const registerUser=asyncHandler(async (req,res)=>{
 */
 
 const loginUser = asyncHandler(async(req,res)=>{
+    
     const {email,username,password}=req.body
 
     if(!(username||email)){
