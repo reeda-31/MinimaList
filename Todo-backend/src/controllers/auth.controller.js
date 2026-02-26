@@ -60,9 +60,12 @@ const registerUser=asyncHandler(async (req,res)=>{
         if(!avatarUploadResponse?.secure_url){
             throw new ApiError(500,"Failed to upload Avatar.")
         }
-        avatar=avatarUploadResponse.url
+        avatar={
+                public_id: avatarUploadResponse.public_id,
+                url:avatarUploadResponse.url
             }
-            else{
+        }
+        else{
         avatar={
             public_id: null,
             url:`${process.env.BASE_URL}/image.png`

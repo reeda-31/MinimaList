@@ -32,5 +32,18 @@ const uploadFile=async(localFilePath,dir=FOLDER_NAME)=>
     }
 }
 
-export {uploadFile}
+const deleteFile=async(file)=>{
+    try {
+        if(!file)
+            return false
+        const publicId=file.public_id
+        const result = await cloudinary.v2.uploader.destroy(publicId)
+        return result.result==="ok"
+    } catch (error) {
+        console.log("Failed to delete avatar")
+        return false      
+    }
+}
+
+export {uploadFile,deleteFile}
 
