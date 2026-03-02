@@ -9,12 +9,13 @@ const todoSchema=new mongoose.Schema({
         type:Boolean,
         default:false
     },
-    User:{
+    user:{
         type: mongoose.Schema.Types.ObjectId,
         ref:"User"
     },
     dueDate:{
-        type:Date
+        type:Date,
+        default:null
     },
     reminderSent:{
         type:Boolean,
