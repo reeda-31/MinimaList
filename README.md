@@ -1,1 +1,1 @@
-## A full stack todo list webApp in progress
+## A full stack todo list webApp in progress. 
