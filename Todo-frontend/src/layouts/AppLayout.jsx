@@ -4,7 +4,7 @@ import Header from "../components/custom/Header"
 const AppLayout=({children})=>{
     const location = useLocation()
 
-    const showHeaderRoutes=["/feed","create","/profile"]
+    const showHeaderRoutes=["/feed","/create","/profile"]
 
     const shouldShowHeader=showHeaderRoutes.includes(location.pathname)
 
