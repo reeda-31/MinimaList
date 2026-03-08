@@ -13,7 +13,7 @@ const ProfilePage = () => {
   });
   const navigate = useNavigate();
 
-  const { user, loading, refreshUser } = useAuth();
+  const { user, refreshUser } = useAuth();
 
   const handleStats = async () => {
     try {
@@ -49,7 +49,8 @@ const ProfilePage = () => {
 
   useEffect(() => {
     handleStats();
-  }, []);
+    refreshUser();
+  }, [stats]);
 
   if (!user) return <div className="p-10">Loading...</div>;
 
