@@ -3,6 +3,7 @@ import Avatar from "../components/ui/Avatar";
 import Button from "../components/ui/Button";
 import { useAuth } from "../context/AuthContext";
 import { Navigate, useNavigate } from "react-router-dom";
+import moment from "moment";
 
 const ProfilePage = () => {
   const [stats, setStats] = useState({
@@ -10,9 +11,45 @@ const ProfilePage = () => {
     completed: 0,
     pending: 0,
   });
-  const navigate=useNavigate()
+  const navigate = useNavigate();
 
   const { user, loading, refreshUser } = useAuth();
+
+  const handleStats = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE}/todo/fetch-todos`,
+        {
+          method: "GET",
+          credentials: "include",
+        },
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error("Could'nt fetch data");
+      }
+      let completedTodos = 0,
+        incompleteTodos = 0;
+      data.data.forEach((todo) => {
+        if (todo.completed) {
+          completedTodos++;
+        } else {
+          incompleteTodos++;
+        }
+      });
+      setStats({
+        total: data.data.length,
+        completed: completedTodos,
+        pending: incompleteTodos,
+      });
+    } catch (error) {
+      console.error("Fetch error:", error);
+    }
+  };
+
+  useEffect(() => {
+    handleStats();
+  }, []);
 
   if (!user) return <div className="p-10">Loading...</div>;
 
@@ -41,7 +78,7 @@ const ProfilePage = () => {
             <p className="text-gray-500 break-all">{user.email}</p>
 
             <p className="text-sm text-gray-400">
-              Joined: {new Date(user.createdAt).toLocaleDateString()}
+              Joined: {moment(user.createdAt).format("MMM D, YYYY")}
             </p>
           </div>
         </div>
