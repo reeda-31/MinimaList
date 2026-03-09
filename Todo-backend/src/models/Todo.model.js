@@ -13,6 +13,10 @@ const todoSchema=new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref:"User"
     },
+    category:{
+        type:String,
+        default:null
+    },
     dueDate:{
         type:Date,
         default:null
