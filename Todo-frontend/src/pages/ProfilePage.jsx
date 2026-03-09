@@ -62,17 +62,17 @@ const ProfilePage = () => {
         Profile
       </h1>
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 p-6">
         {/* Avatar + Info */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
           <Avatar
             src={user?.avatar?.url}
             alt={user.username}
-            size="w-28 sm:w-32 md:w-36"
+            size="w-26 sm:w-30 md:w-34"
           />
 
           <div className="space-y-1">
-            <h2 className="text-xl sm:text-2xl font-semibold">
+            <h2 className="text-xl sm:text-2xl font-semibold mt-6">
               {user.username}
             </h2>
 
