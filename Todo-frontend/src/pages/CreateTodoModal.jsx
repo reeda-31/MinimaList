@@ -2,8 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import Button from "../components/ui/Button";
 import "cally";
 import moment from "moment";
+import { useNavigate } from "react-router-dom";
 
 const CreateTodoModal = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [dueDate, setDueDate] = useState("");
   const calendarRef = useRef(null);
@@ -55,7 +57,10 @@ const CreateTodoModal = ({ isOpen, onClose }) => {
       setTitle("");
       setDueDate("");
       onClose();
-      alert("Task created successfully!");
+      // console.log(data.data)
+      navigate("/feed", {
+        state: { newTodo: data.data },
+      });
     } catch (error) {
       console.error(error);
       alert("Something went wrong");

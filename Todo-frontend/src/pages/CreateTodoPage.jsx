@@ -2,8 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import Button from "../components/ui/Button";
 import "cally";
 import moment from "moment";
+import { useNavigate } from "react-router-dom";
 
 const CreateTodoPage = () => {
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [dueDate, setDueDate] = useState("");
   const calendarRef = useRef(null);
@@ -51,7 +53,9 @@ const CreateTodoPage = () => {
       setTitle("");
       setDueDate("");
 
-      alert("Todo created successfully!");
+      navigate("/feed", {
+        state: { newTodo: data.data },
+      });
     } catch (error) {
       console.error(error);
       alert("Something went wrong");
@@ -102,7 +106,9 @@ const CreateTodoPage = () => {
                 id="cally1"
                 style={{ anchorName: "--cally1" }}
               >
-                {dueDate ? moment(dueDate).format("MMM Do YYYY") : "Pick a date"}
+                {dueDate
+                  ? moment(dueDate).format("MMM Do YYYY")
+                  : "Pick a date"}
               </button>
               <div
                 popover="manual"

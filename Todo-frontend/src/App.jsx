@@ -4,6 +4,7 @@ import AppLayout from "./layouts/AppLayout";
 import LandingPage from "./pages/LandingPage";
 import RegisterPage from "./pages/RegisterPage";
 import ProfilePage from "./pages/ProfilePage";
+import FeedPage from "./pages/FeedPage";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/register" element={<RegisterPage />}/>
           <Route path="/profile" element={<ProfilePage />}/>
+          <Route path="/feed" element={<FeedPage />}/>
         </Routes>
       </AppLayout>
     </BrowserRouter>

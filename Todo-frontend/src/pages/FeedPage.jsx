@@ -1,0 +1,375 @@
+// const FeedPage = ({ todos }) => {
+//   const { user, loading } = useAuth();
+//   const [tasks, setTasks] = useState([]);
+//   const [selectedCategory, setSelectedCategory] = useState(null);
+//   const [loadingFeed, setLoadingFeed] = useState(true);
+//   const [deletingId, setDeletingId] = useState(null);
+
+//   const handleDelete = async (id) => {
+//     try {
+//       setDeletingId(id);
+//       const response = await fetch(
+//         `${import.meta.env.VITE_API_BASE}/todo/delete-todo/${id}`,
+//         {
+//           method: "DELETE",
+//           credentials: "include",
+//         },
+//       );
+
+//       if (!response.ok) {
+//         throw new Error("Failed to delete task");
+//       }
+//       setTasks((prev) => prev.filter((task) => task._id !== id));
+//     } catch (error) {
+//       console.error(error);
+//     } finally {
+//       setDeletingId(null);
+//     }
+//   };
+
+//   useEffect(() => {
+//     const fetchTasks = async () => {
+//       try {
+//         const response = await fetch(
+//           `${import.meta.env.VITE_API_BASE}/todo/fetch-todos`,
+//           { credentials: "include" },
+//         );
+
+//         const data = await response.json();
+//         setTasks(data.data);
+//       } catch (error) {
+//         console.error(error);
+//       } finally {
+//         setLoadingFeed(false);
+//       }
+//     };
+//     fetchTasks();
+//   }, []);
+
+//   if (loading) return null;
+
+//   if (!user) {
+//     return <Navigate to="/login" replace />;
+//   }
+
+//   const filteredTodos = selectedCategory
+//     ? todos.filter((todo) => todo.category === selectedCategory)
+//     : todos;
+
+//   return (
+//     <div className="max-w-3xl mx-auto p-6 space-y-4">
+//       {tasks.length === 0 && (
+//         <p className="text-center text-muted-foreground">No tasks yet.</p>
+//       )}
+
+//       {tasks.map((task) => (
+//         <div
+//           className="group bg-base-200 p-4 rounded-xl shadow-md flex justify-between items-start hover:shadow-lg transition-all"
+//           key={task._id}
+//         >
+//           {/* Left Content */}
+//           <div className="space-y-2">
+//             <h2 className="text-lg font-semibold">{task.title}</h2>
+
+//             {/* Category badge only if exists */}
+//             {task.category && (
+//               <div
+//                 className="badge badge-outline cursor-pointer"
+//                 onClick={() => onCategoryClick(task.category)}
+//               >
+//                 {task.category}
+//               </div>
+//             )}
+//           </div>
+
+//           {/* Hover buttons */}
+//           <div className="opacity-0 group-hover:opacity-100 flex gap-2 transition">
+//             <Button
+//               variant="btn-outline"
+//               className="btn-sm"
+//               onClick={() => handleEdit(task._id)}
+//             >
+//               <Pencil size={16} />
+//             </Button>
+
+//             <Button
+//               variant="btn-error btn-outline"
+//               className="btn-sm"
+//               onClick={() => handleDelete(task._id)}
+//             >
+//               <Trash2 size={16} />
+//             </Button>
+//           </div>
+//         </div>
+//       ))}
+//     </div>
+//   );
+// };
+
+import React, { useState, useMemo, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import {
+  Folder,
+  CheckCircle2,
+  ListTodo,
+  Pencil,
+  Trash2,
+  Menu,
+  X,
+} from "lucide-react";
+
+const FeedPage = () => {
+  const location = useLocation();
+  const { user, loading } = useAuth();
+
+  const [tasks, setTasks] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [loadingFeed, setLoadingFeed] = useState(true);
+  const [deletingId, setDeletingId] = useState(null);
+
+  const handleDelete = async (id) => {
+    try {
+      setDeletingId(id);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE}/todo/delete-todo/${id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete task");
+      }
+      setTasks((prev) => prev.filter((task) => task._id !== id));
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_BASE}/todo/fetch-todos`,
+          { credentials: "include" },
+        );
+
+        const data = await response.json();
+        //   setTasks(data.data);
+        //   if (location.state?.newTodo) {
+        //   todos = [location.state.newTodo, ...todos];
+        // }
+        let todos = data.data;
+
+        if (location.state?.newTodo) {
+          todos = [
+            location.state.newTodo,
+            ...todos.filter((t) => t._id !== location.state.newTodo._id),
+          ];
+        }
+
+        setTasks(todos);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoadingFeed(false);
+      }
+    };
+    fetchTasks();
+  }, [tasks]);
+
+  // Extract categories
+  const categories = useMemo(() => {
+    const map = {};
+    tasks.forEach((todo) => {
+      if (todo.category) {
+        if (!map[todo.category]) {
+          map[todo.category] = {
+            total: 0,
+            completed: 0,
+          };
+        }
+
+        map[todo.category].total += 1;
+
+        if (todo.completed) map[todo.category].completed += 1;
+      }
+    });
+
+    return map;
+  }, [tasks]);
+
+  const categoryNames = Object.keys(categories);
+
+  // Filter todos by category
+  const filteredTodos =
+    selectedCategory === "All"
+      ? tasks
+      : tasks.filter((t) => t.category === selectedCategory);
+
+  const toggleComplete = (id) => {
+    setTasks((prev) =>
+      prev.map((todo) =>
+        todo._id === id ? { ...todo, completed: !todo.completed } : todo,
+      ),
+    );
+  };
+
+  if (loading) return null;
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (loadingFeed) {
+    return <div className="p-6">Loading tasks...</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-base-200 flex">
+      <button
+        className="absolute top-4 left-4 z-50 btn btn-sm"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+      >
+        {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
+      </button>
+
+      {/* SIDEBAR */}
+      <aside
+        className={`fixed md:static z-40 min-h-screen bg-base-100 border-r w-64 p-5 space-y-4 transform transition-transform
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+      >
+        <h2 className="font-bold text-lg flex items-center gap-2">
+          <Folder size={18} />
+          Categories
+        </h2>
+
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={() => setSelectedCategory("All")}
+            className={`btn btn-sm justify-start ${
+              selectedCategory === "All" ? "btn-primary" : "btn-ghost"
+            }`}
+          >
+            <ListTodo size={16} />
+            All Tasks
+          </button>
+
+          {categoryNames.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`btn btn-sm justify-start ${
+                selectedCategory === cat ? "btn-primary" : "btn-ghost"
+              }`}
+            >
+              <Folder size={16} />
+              {cat}
+            </button>
+          ))}
+        </div>
+      </aside>
+
+      {/* MAIN CONTENT */}
+      <main
+        className={`flex-1 p-6 max-w-7xl mx-auto transition-all duration-300`}
+      >
+        {/* Heading */}
+        <h1 className="text-3xl font-bold mb-6">Here are your tasks</h1>
+
+        {/* CATEGORY CARDS */}
+        {categoryNames.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-8">
+            {categoryNames.map((cat) => (
+              <div
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className="card bg-base-100 shadow cursor-pointer hover:shadow-lg transition"
+              >
+                <div className="card-body p-4">
+                  <div className="flex items-center gap-2 font-semibold">
+                    <Folder size={18} />
+                    {cat}
+                  </div>
+
+                  <p className="text-sm text-base-content/70">
+                    {categories[cat].completed} / {categories[cat].total}{" "}
+                    completed
+                  </p>
+
+                  <progress
+                    className="progress progress-primary w-full"
+                    value={categories[cat].completed}
+                    max={categories[cat].total}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* TODO GRID */}
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+          {filteredTodos.map((todo) => (
+            <div
+              key={todo._id}
+              className="card bg-base-100 shadow group hover:shadow-lg"
+            >
+              <div className="card-body">
+                <div className="flex items-start gap-3">
+                  {/* CHECKBOX */}
+                  <input
+                    type="checkbox"
+                    className="checkbox checkbox-primary mt-1"
+                    checked={todo.completed}
+                    onChange={() => toggleComplete(todo._id)}
+                  />
+
+                  <div className="flex-1">
+                    <h2
+                      className={`font-semibold text-lg ${
+                        todo.completed ? "line-through opacity-60" : ""
+                      }`}
+                    >
+                      {todo.title}
+                    </h2>
+
+                    {todo.category && (
+                      <span className="badge badge-outline mt-2">
+                        {todo.category}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* /* HOVER ACTIONS* */}
+                <div className="flex gap-2 mt-4 opacity-0 group-hover:opacity-100 transition">
+                  <button className="btn btn-sm btn-ghost">
+                    <Pencil size={16} />
+                  </button>
+
+                  <button
+                    className="btn btn-sm btn-ghost text-error"
+                    onClick={() => {
+                      handleDelete(todo._id);
+                    }}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default FeedPage;
