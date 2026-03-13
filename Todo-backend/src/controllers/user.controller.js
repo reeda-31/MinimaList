@@ -55,7 +55,7 @@ const updateUserProfile=asyncHandler(async(req,res)=>{
                 throw new ApiError(500,"Avatar upload failed");
             }
             if(user.avatar.public_id){
-                await deleteFile(user.avatar.public_id)
+                await deleteFile(user.avatar)
             }
             user.avatar={
                 public_id:avatarUploadResponse.public_id,
