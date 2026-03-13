@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 const CreateTodoPage = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("");
   const [dueDate, setDueDate] = useState("");
   const calendarRef = useRef(null);
   useEffect(() => {
@@ -39,6 +40,7 @@ const CreateTodoPage = () => {
           },
           body: JSON.stringify({
             title,
+            category,
             dueDate,
           }),
         },
@@ -51,6 +53,7 @@ const CreateTodoPage = () => {
       }
 
       setTitle("");
+      setCategory("");
       setDueDate("");
 
       navigate("/feed", {
@@ -85,19 +88,28 @@ const CreateTodoPage = () => {
               />
             </div>
 
+            {/* Add Category */}
+             <div className="form-control">
+              <label className="label">
+                <span className="label-text font-medium">Category</span>
+              </label>
+
+              <input
+                type="text"
+                placeholder="Enter task category"
+                className="input input-bordered w-full focus:outline-none"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                required
+              />
+            </div>
+
             {/* Due Date */}
             <div className="form-control">
               <label className="label">
                 <span className="label-text font-medium">Due Date</span>
               </label>
 
-              {/*<input
-                type="date"
-                className="input input-bordered w-full focus:outline-none"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                required
-              /> */}
 
               <button
                 type="button"

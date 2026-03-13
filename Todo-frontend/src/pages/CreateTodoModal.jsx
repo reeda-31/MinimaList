@@ -4,9 +4,10 @@ import "cally";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 
-const CreateTodoModal = ({ isOpen, onClose }) => {
+const CreateTodoModal = ({ isOpen, onClose, addTodo }) => {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("");
   const [dueDate, setDueDate] = useState("");
   const calendarRef = useRef(null);
 
@@ -29,6 +30,7 @@ const CreateTodoModal = ({ isOpen, onClose }) => {
   const handleClose = () => {
     setTitle("");
     setDueDate("");
+    setCategory("");
     onClose();
   };
 
@@ -44,7 +46,7 @@ const CreateTodoModal = ({ isOpen, onClose }) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ title, dueDate }),
+          body: JSON.stringify({ title, category, dueDate }),
         },
       );
 
@@ -54,13 +56,12 @@ const CreateTodoModal = ({ isOpen, onClose }) => {
         throw new Error(data.message || "Failed to create task");
       }
 
+      addTodo(data.data);
+
       setTitle("");
       setDueDate("");
+      setCategory("");
       onClose();
-      // console.log(data.data)
-      navigate("/feed", {
-        state: { newTodo: data.data },
-      });
     } catch (error) {
       console.error(error);
       alert("Something went wrong");
@@ -88,6 +89,20 @@ const CreateTodoModal = ({ isOpen, onClose }) => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
+            />
+          </div>
+          {/* Category */}
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">Category</span>
+            </label>
+
+            <input
+              type="text"
+              placeholder="Enter task title"
+              className="input input-bordered w-full focus:outline-none"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
             />
           </div>
 
@@ -139,7 +154,11 @@ const CreateTodoModal = ({ isOpen, onClose }) => {
 
           {/* Buttons */}
           <div className="modal-action">
-            <button type="button" className="btn btn-ghost" onClick={handleClose}>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={handleClose}
+            >
               Cancel
             </button>
 

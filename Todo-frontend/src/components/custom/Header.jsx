@@ -1,14 +1,14 @@
 import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { CirclePlus,Menu } from "lucide-react";
+import { CirclePlus, Menu } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { Navigate } from "react-router-dom";
 import Avatar from "../ui/Avatar";
 import Button from "../ui/Button";
 import CreateTodoModal from "../../pages/CreateTodoModal";
 
-const Header = () => {
+const Header = ({ addTodo }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
@@ -39,9 +39,10 @@ const Header = () => {
           onClick={() => navigate("/profile")}
         />
         <CreateTodoModal
-        isOpen={openModal}
-        onClose={() => setOpenModal(false)}
-      />
+          isOpen={openModal}
+          onClose={() => setOpenModal(false)}
+          addTodo={addTodo}
+        />
       </div>
     </div>
   );
