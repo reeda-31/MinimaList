@@ -5,12 +5,9 @@ import { useAuth } from "../context/AuthContext";
 import CreateTodoModal from "./CreateTodoModal";
 import {
   Folder,
-  CheckCircle2,
   ListTodo,
   Pencil,
   Trash2,
-  Menu,
-  X,
 } from "lucide-react";
 import Header from "../components/custom/Header";
 
@@ -104,12 +101,34 @@ const FeedPage = () => {
       ? tasks
       : tasks.filter((t) => t.category === selectedCategory);
 
-  const toggleComplete = (id) => {
-    setTasks((prev) =>
-      prev.map((todo) =>
-        todo._id === id ? { ...todo, completed: !todo.completed } : todo,
-      ),
-    );
+  const toggleComplete = async (id) => {
+    try {
+      const todo = tasks.find((t) => t._id === id);
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE}/todo/update-todo/${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            completed: !todo.completed,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update todo");
+      }
+
+      const data = await response.json();
+
+      setTasks((prev) => prev.map((t) => (t._id === id ? data.data : t)));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   if (loading) return null;
@@ -124,20 +143,19 @@ const FeedPage = () => {
 
   return (
     <>
-      <Header addTodo={addTodo} />
+      <Header
+        addTodo={addTodo}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        hasCategories={categoryNames.length > 0}
+      />
 
-      <div className="min-h-screen bg-base-200 flex">
-        <button
-          className="absolute top-4 left-4 z-50 btn btn-sm"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-        >
-          {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
-        </button>
-
+      <div className="min-h-screen bg-base-200 flex relative ">
         {/* SIDEBAR */}
         <aside
-          className={`fixed md:static z-40 min-h-screen bg-base-100 border-r w-64 p-5 space-y-4 transform transition-transform
-        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+          className={`z-40 bg-base-100 border-r w-64 p-5 space-y-4 transform transition-all duration-300 fixed top-16 h-[calc(100vh-4rem)]
+md:relative md:top-0 md:h-auto md:translate-x-0
+              ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:w-0 md:p-0 md:overflow-hidden"}`}
         >
           <h2 className="font-bold text-lg flex items-center gap-2">
             <Folder size={18} />
@@ -172,10 +190,14 @@ const FeedPage = () => {
 
         {/* MAIN CONTENT */}
         <main
-          className={`flex-1 p-6 max-w-7xl mx-auto transition-all duration-300`}
+          className={`flex-1 lg:px-40 p-6 transition-all duration-300 ${
+            sidebarOpen ? "max-w-full" : "max-w-8xl"
+          }`}
         >
           {/* Heading */}
-          <h1 className="text-3xl font-bold mb-6">Here are your tasks</h1>
+          <h1 className="text-3xl font-bold mb-6 text-center">
+            Here are your tasks
+          </h1>
 
           {/* CATEGORY CARDS */}
           {categoryNames.length > 0 && (

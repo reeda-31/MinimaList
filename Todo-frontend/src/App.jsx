@@ -6,6 +6,7 @@ import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
 import FeedPage from "./pages/FeedPage";
+import EditProfilePage from "./pages/EditProfilePage";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/login" element={<LoginPage />}/>
           <Route path="/profile" element={<ProfilePage />}/>
           <Route path="/feed" element={<FeedPage />}/>
+          <Route path="/edit-profile" element={<EditProfilePage />}/>
         </Routes>
       </AppLayout>
     </BrowserRouter>
