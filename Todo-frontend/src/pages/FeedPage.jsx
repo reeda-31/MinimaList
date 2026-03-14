@@ -200,8 +200,9 @@ md:relative md:top-0 md:h-auto md:translate-x-0
           }`}
         >
           {/* Heading */}
+
           <h1 className="text-3xl font-bold mb-6 text-center">
-            Here are your tasks
+            {tasks.length>0?"Here are your tasks":"Add your first task! "}
           </h1>
 
           {/* CATEGORY CARDS */}
@@ -261,7 +262,8 @@ md:relative md:top-0 md:h-auto md:translate-x-0
                         {todo.title}
                       </h2>
                       <h6 className="flex items-center gap-1 text-xs text-gray my-1">
-                        <Calendar size={12} /> : {moment(todo.dueDate).format("MMM D, YYYY")}
+                        <Calendar size={12} /> :{" "}
+                        {moment(todo.dueDate).format("MMM D, YYYY")}
                       </h6>
 
                       {todo.category && (
