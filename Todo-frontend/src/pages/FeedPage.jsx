@@ -2,14 +2,11 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import CreateTodoModal from "./CreateTodoModal";
-import {
-  Folder,
-  ListTodo,
-  Pencil,
-  Trash2,
-} from "lucide-react";
+import EditTodoModal from "./EditTodoModal";
+import { Folder, ListTodo, Pencil, Trash2 } from "lucide-react";
 import Header from "../components/custom/Header";
+import moment from "moment";
+import { Calendar } from "lucide-react";
 
 const FeedPage = () => {
   const location = useLocation();
@@ -20,6 +17,8 @@ const FeedPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loadingFeed, setLoadingFeed] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
+  const [openTodoModal, setOpenTodoModal] = useState(false);
+  const [selectedTodo, setSelectedTodo] = useState(null);
 
   const addTodo = (todo) => {
     setTasks((prev) => [todo, ...prev]);
@@ -129,6 +128,12 @@ const FeedPage = () => {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const updateTodo = (updatedTodo) => {
+    setTasks((prev) =>
+      prev.map((t) => (t._id === updatedTodo._id ? updatedTodo : t)),
+    );
   };
 
   if (loading) return null;
@@ -255,6 +260,9 @@ md:relative md:top-0 md:h-auto md:translate-x-0
                       >
                         {todo.title}
                       </h2>
+                      <h6 className="flex items-center gap-1 text-xs text-gray my-1">
+                        <Calendar size={12} /> : {moment(todo.dueDate).format("MMM D, YYYY")}
+                      </h6>
 
                       {todo.category && (
                         <span className="badge badge-outline mt-2">
@@ -266,7 +274,13 @@ md:relative md:top-0 md:h-auto md:translate-x-0
 
                   {/* /* HOVER ACTIONS* */}
                   <div className="flex gap-2 mt-4 opacity-0 group-hover:opacity-100 transition">
-                    <button className="btn btn-sm btn-ghost">
+                    <button
+                      className="btn btn-sm btn-ghost"
+                      onClick={() => {
+                        setSelectedTodo(todo);
+                        setOpenTodoModal(true);
+                      }}
+                    >
                       <Pencil size={16} />
                     </button>
 
@@ -284,6 +298,12 @@ md:relative md:top-0 md:h-auto md:translate-x-0
             ))}
           </div>
         </main>
+        <EditTodoModal
+          isOpen={openTodoModal}
+          onClose={() => setOpenTodoModal(false)}
+          todo={selectedTodo}
+          updateTodo={updateTodo}
+        ></EditTodoModal>
       </div>
     </>
   );

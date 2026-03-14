@@ -4,7 +4,7 @@ import { ApiResponse } from "../lib/ApiResponse.js";
 import {Todo} from "../models/Todo.model.js"
 
 const createTodo = asyncHandler(async(req,res)=>{
-    console.log(req.body)
+    // console.log(req.body)
     const {title,dueDate,completed,category}=req.body
 
     if(!title||!title.trim()){
@@ -33,8 +33,8 @@ const updateTodo=asyncHandler(async(req,res)=>{
     if(!todo){
         throw new ApiError(404,"Todo not found")
     }
-    const{title,completed,dueDate}=req.body
-    if(title === undefined && completed === undefined && dueDate === undefined){
+    const{title,completed,dueDate,category}=req.body
+    if(title === undefined && completed === undefined && dueDate === undefined && category===undefined){
         throw new ApiError(400,"Fields are missing")
     }
     else{
@@ -47,6 +47,9 @@ const updateTodo=asyncHandler(async(req,res)=>{
         if(dueDate){
             todo.dueDate=dueDate
             todo.reminderSent=false
+        }
+        if(category){
+            todo.category=category
         }
     }
 
