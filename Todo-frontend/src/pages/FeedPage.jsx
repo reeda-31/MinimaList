@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import EditTodoModal from "./EditTodoModal";
@@ -7,10 +7,12 @@ import { Folder, ListTodo, Pencil, Trash2 } from "lucide-react";
 import Header from "../components/custom/Header";
 import moment from "moment";
 import { Calendar } from "lucide-react";
+import Button from "../components/ui/Button";
 
 const FeedPage = () => {
   const location = useLocation();
-  const { user, loading } = useAuth();
+  const navigate=useNavigate();
+  const { user, loading,logout } = useAuth();
 
   const [tasks, setTasks] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -19,6 +21,11 @@ const FeedPage = () => {
   const [deletingId, setDeletingId] = useState(null);
   const [openTodoModal, setOpenTodoModal] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState(null);
+
+  const handleLogout=async ()=>{
+  await logout();
+  navigate("/login");
+  }
 
   const addTodo = (todo) => {
     setTasks((prev) => [todo, ...prev]);
@@ -191,6 +198,15 @@ md:relative md:top-0 md:h-auto md:translate-x-0
               </button>
             ))}
           </div>
+          <div className="pt-4 border-t">
+            <Button
+              variant="btn-ghost"
+              className="w-full justify-start text-error"
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </div>
         </aside>
 
         {/* MAIN CONTENT */}
@@ -202,7 +218,7 @@ md:relative md:top-0 md:h-auto md:translate-x-0
           {/* Heading */}
 
           <h1 className="text-3xl font-bold mb-6 text-center">
-            {tasks.length>0?"Here are your tasks":"Add your first task! "}
+            {tasks.length > 0 ? "Here are your tasks" : "Add your first task! "}
           </h1>
 
           {/* CATEGORY CARDS */}

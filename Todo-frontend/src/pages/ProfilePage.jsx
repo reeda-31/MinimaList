@@ -6,6 +6,8 @@ import { Navigate, useNavigate } from "react-router-dom";
 import moment from "moment";
 
 const ProfilePage = () => {
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
     completed: 0,
@@ -14,6 +16,31 @@ const ProfilePage = () => {
   const navigate = useNavigate();
 
   const { user, refreshUser } = useAuth();
+  const handleDeleteAccount = async () => {
+    try {
+      setDeleting(true);
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE}/user/delete-user`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete account");
+      }
+
+      navigate("/login"); // redirect after deletion
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong");
+    } finally {
+      setDeleting(false);
+      setOpenDeleteModal(false);
+    }
+  };
 
   const handleStats = async () => {
     try {
@@ -55,79 +82,134 @@ const ProfilePage = () => {
   if (!user) return <div className="p-10">Loading...</div>;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
-      {/* PROFILE HEADER */}
+    <>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+        {/* PROFILE HEADER */}
 
-      <h1 className="text-2xl sm:text-3xl font-semibold border-b pb-4">
-        Profile
-      </h1>
+        <h1 className="text-2xl sm:text-3xl font-semibold border-b pb-4">
+          Profile
+        </h1>
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 p-6">
-        {/* Avatar + Info */}
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
-          <Avatar
-            src={user?.avatar?.url}
-            alt={user.username}
-            size="w-26 sm:w-30 md:w-34"
-          />
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 p-6">
+          {/* Avatar + Info */}
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
+            <Avatar
+              src={user?.avatar?.url}
+              alt={user.username}
+              size="w-26 sm:w-30 md:w-34"
+            />
 
-          <div className="space-y-1">
-            <h2 className="text-xl sm:text-2xl font-semibold mt-6">
-              {user.username}
-            </h2>
+            <div className="space-y-1">
+              <h2 className="text-xl sm:text-2xl font-semibold mt-6">
+                {user.username}
+              </h2>
 
-            <p className="text-gray-500 break-all">{user.email}</p>
+              <p className="text-gray-500 break-all">{user.email}</p>
 
-            <p className="text-sm text-gray-400">
-              Joined: {moment(user.createdAt).format("MMM D, YYYY")}
-            </p>
+              <p className="text-sm text-gray-400">
+                Joined: {moment(user.createdAt).format("MMM D, YYYY")}
+              </p>
+            </div>
+          </div>
+
+          {/* Button */}
+          <div className="flex justify-center sm:justify-end">
+            <Button
+              variant="btn-secondary"
+              onClick={() => navigate("/edit-profile")}
+            >
+              Edit Profile
+            </Button>
           </div>
         </div>
 
-        {/* Button */}
-        <div className="flex justify-center sm:justify-end">
+        {/* DIVIDER */}
+        <div className="border-b"></div>
+
+        {/* TODO STATISTICS */}
+
+        <h2 className="text-xl sm:text-2xl font-semibold text-center sm:text-left margin-0">
+          Your Statistics
+        </h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 text-center mt-6 divide-y sm:divide-y-0 sm:divide-x">
+          {/* TOTAL TODOS */}
+          <div className="space-y-2 py-6 sm:py-0">
+            <p className="text-3xl sm:text-4xl font-bold">{stats.total}</p>
+
+            <p className="text-gray-500">Total Tasks</p>
+          </div>
+
+          {/* COMPLETED */}
+          <div className="space-y-2 py-15 sm:py-0 ">
+            <p className="text-3xl sm:text-4xl font-bold">{stats.completed}</p>
+
+            <p className="text-gray-500">Completed</p>
+          </div>
+
+          {/* PENDING */}
+          <div className="space-y-2 py-6 sm:py-0">
+            <p className="text-3xl sm:text-4xl font-bold">{stats.pending}</p>
+
+            <p className="text-gray-500">Pending</p>
+          </div>
+        </div>
+        {/* DANGER ZONE */}
+        <div className="mt-10 border-t pt-6">
+          <h3 className="text-lg font-semibold text-error mb-3">Danger Zone</h3>
+
+          <p className=" text-gray-400 mb-4">
+            Deleting your account is permanent and cannot be undone.
+          </p>
+
           <Button
-            variant="btn-secondary"
-            onClick={() => navigate("/edit-profile")}
+            variant="btn-error btn-outline"
+            onClick={() => setOpenDeleteModal(true)}
+            className="w-full sm:w-auto"
           >
-            Edit Profile
+            Delete Account
           </Button>
         </div>
       </div>
 
-      {/* DIVIDER */}
-      <div className="border-b"></div>
+      {openDeleteModal && (
+        <div className="modal modal-open">
+          <div className="modal-box w-11/12 max-w-md">
+            <h3 className="font-bold text-lg text-error">Delete Account</h3>
 
-      {/* TODO STATISTICS */}
+            <p className="py-4 text-sm text-base-content/70">
+              This action cannot be undone. All your data will be permanently
+              deleted.
+            </p>
 
-      <h2 className="text-xl sm:text-2xl font-semibold text-center sm:text-left margin-0">
-        Your Statistics
-      </h2>
+            <div className="modal-action flex flex-col sm:flex-row gap-2">
+              <Button
+                variant="btn-ghost"
+                className="w-full sm:w-auto"
+                onClick={() => setOpenDeleteModal(false)}
+              >
+                Cancel
+              </Button>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 text-center mt-6 divide-y sm:divide-y-0 sm:divide-x">
-        {/* TOTAL TODOS */}
-        <div className="space-y-2 py-6 sm:py-0">
-          <p className="text-3xl sm:text-4xl font-bold">{stats.total}</p>
+              <Button
+                variant="btn-error"
+                className="w-full sm:w-auto"
+                onClick={handleDeleteAccount}
+                disabled={deleting}
+              >
+                {deleting ? "Deleting..." : "Delete Account"}
+              </Button>
+            </div>
+          </div>
 
-          <p className="text-gray-500">Total Tasks</p>
+          {/* backdrop */}
+          <div
+            className="modal-backdrop"
+            onClick={() => setOpenDeleteModal(false)}
+          ></div>
         </div>
-
-        {/* COMPLETED */}
-        <div className="space-y-2 py-15 sm:py-0 ">
-          <p className="text-3xl sm:text-4xl font-bold">{stats.completed}</p>
-
-          <p className="text-gray-500">Completed</p>
-        </div>
-
-        {/* PENDING */}
-        <div className="space-y-2 py-6 sm:py-0">
-          <p className="text-3xl sm:text-4xl font-bold">{stats.pending}</p>
-
-          <p className="text-gray-500">Pending</p>
-        </div>
-      </div>
-      <div className="border-b mt-4"></div>
-    </div>
+      )}
+    </>
   );
 };
 
