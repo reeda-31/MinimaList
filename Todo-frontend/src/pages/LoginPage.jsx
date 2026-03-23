@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
+import  Button  from "../components/ui/Button";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -101,7 +102,8 @@ const LoginPage = () => {
 
                 <Button
                   type="button"
-                  className="absolute right-3 top-3 text-base-content/60"
+                  variant="btn-ghost"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/60"
                   onClick={() => setShowPassword((prev) => !prev)}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}

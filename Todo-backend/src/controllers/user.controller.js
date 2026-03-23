@@ -79,6 +79,7 @@ const deleteUser = asyncHandler(async(req,res)=>{
         {
             throw new ApiError(404,"User not found")
         }
+        await Todo.deleteMany({ user: user._id });
         const userAvatar = user.avatar
         if(userAvatar){
             await deleteFile(userAvatar)

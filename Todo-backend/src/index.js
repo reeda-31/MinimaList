@@ -1,6 +1,7 @@
 
 import "./env/env.js";
 import connectDb from "./lib/db.js"
+import { startReminderCron } from "./lib/reminderCron.js";
 
 // dotenv.config({
 //     path:'./.env'
@@ -16,6 +17,7 @@ connectDb()
 .then(()=>{
     app.listen(process.env.PORT||8000,()=>{
         console.log(`Server is running at port ${process.env.PORT}`)
+        startReminderCron();
     })
 })
 .catch((error)=>{

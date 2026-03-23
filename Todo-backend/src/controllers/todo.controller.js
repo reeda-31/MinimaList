@@ -5,7 +5,7 @@ import {Todo} from "../models/Todo.model.js"
 
 const createTodo = asyncHandler(async(req,res)=>{
     // console.log(req.body)
-    const {title,dueDate,completed,category}=req.body
+    const {title,dueDate,completed,category,reminderSent}=req.body
 
     if(!title||!title.trim()){
         throw new ApiError(400,"Title is required")
@@ -20,7 +20,8 @@ const createTodo = asyncHandler(async(req,res)=>{
         user:req.user._id,
         dueDate,
         completed,
-        category
+        category,
+        reminderSent
     })
 
     return res.status(201).json(new ApiResponse(201,newTodo,"Todo Created Successfully"))
