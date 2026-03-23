@@ -15,12 +15,13 @@ const Header = ({ addTodo, sidebarOpen, setSidebarOpen, hasCategories }) => {
     <div className="navbar bg-base-100 shadow-md px-4 z-50">
       {hasCategories && (
         <div className="flex items-center gap-3">
-          <button
-            className="btn btn-sm btn-ghost"
+          <Button
+            variant="btn-ghost"
+            className=" btn-sm "
             onClick={() => setSidebarOpen(!sidebarOpen)}
           >
             {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
-          </button>
+          </Button>
         </div>
       )}
 

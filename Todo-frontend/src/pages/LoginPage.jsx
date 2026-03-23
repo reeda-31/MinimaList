@@ -99,23 +99,24 @@ const LoginPage = () => {
                   required
                 />
 
-                <button
+                <Button
                   type="button"
                   className="absolute right-3 top-3 text-base-content/60"
                   onClick={() => setShowPassword((prev) => !prev)}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
+                </Button>
               </div>
             </div>
 
             {/* Login Button */}
-            <button
+            <Button
               type="submit"
-              className={`btn btn-primary w-full ${loading ? "loading" : ""}`}
+              variant="btn-primary"
+              className={` w-full ${loading ? "loading" : ""}`}
             >
               Login
-            </button>
+            </Button>
           </form>
 
           {/* Register Link */}

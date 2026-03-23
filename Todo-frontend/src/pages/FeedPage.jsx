@@ -11,8 +11,8 @@ import Button from "../components/ui/Button";
 
 const FeedPage = () => {
   const location = useLocation();
-  const navigate=useNavigate();
-  const { user, loading,logout } = useAuth();
+  const navigate = useNavigate();
+  const { user, loading, logout } = useAuth();
 
   const [tasks, setTasks] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -22,10 +22,10 @@ const FeedPage = () => {
   const [openTodoModal, setOpenTodoModal] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState(null);
 
-  const handleLogout=async ()=>{
-  await logout();
-  navigate("/login");
-  }
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
 
   const addTodo = (todo) => {
     setTasks((prev) => [todo, ...prev]);
@@ -175,27 +175,29 @@ md:relative md:top-0 md:h-auto md:translate-x-0
           </h2>
 
           <div className="flex flex-col gap-2">
-            <button
+            <Button
               onClick={() => setSelectedCategory("All")}
-              className={`btn btn-sm justify-start ${
+              className="btn-sm justify-start" 
+              variant={`${
                 selectedCategory === "All" ? "btn-primary" : "btn-ghost"
               }`}
             >
               <ListTodo size={16} />
               All Tasks
-            </button>
+            </Button>
 
             {categoryNames.map((cat) => (
-              <button
+              <Button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`btn btn-sm justify-start ${
-                  selectedCategory === cat ? "btn-primary" : "btn-ghost"
+                className = "btn-sm justify-start" 
+                variant={`${
+                  selectedCategory === cat ?"btn-primary" :"btn-ghost"
                 }`}
               >
                 <Folder size={16} />
                 {cat}
-              </button>
+              </Button>
             ))}
           </div>
           <div className="pt-4 border-t">
@@ -292,24 +294,26 @@ md:relative md:top-0 md:h-auto md:translate-x-0
 
                   {/* /* HOVER ACTIONS* */}
                   <div className="flex gap-2 mt-4 opacity-0 group-hover:opacity-100 transition">
-                    <button
-                      className="btn btn-sm btn-ghost"
+                    <Button
+                      variant="btn-ghost"
+                      className="btn-sm"
                       onClick={() => {
                         setSelectedTodo(todo);
                         setOpenTodoModal(true);
                       }}
                     >
                       <Pencil size={16} />
-                    </button>
+                    </Button>
 
-                    <button
-                      className="btn btn-sm btn-ghost text-error"
+                    <Button
+                      variant="btn-ghost"
+                      className=" btn-sm  text-error"
                       onClick={() => {
                         handleDelete(todo._id);
                       }}
                     >
                       <Trash2 size={16} />
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
