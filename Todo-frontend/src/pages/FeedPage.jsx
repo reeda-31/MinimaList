@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { getCategoryColor } from "../utils/CategoryColour.jsx";
 import EditTodoModal from "./EditTodoModal";
 import { Folder, ListTodo, Pencil, Trash2 } from "lucide-react";
 import Header from "../components/custom/Header";
@@ -99,6 +100,8 @@ const FeedPage = () => {
     return map;
   }, [tasks]);
 
+  // const colour = getCategoryColor(category._id);
+
   const categoryNames = Object.keys(categories);
 
   // Filter todos by category
@@ -177,7 +180,7 @@ md:relative md:top-0 md:h-auto md:translate-x-0
           <div className="flex flex-col gap-2">
             <Button
               onClick={() => setSelectedCategory("All")}
-              className="btn-sm justify-start" 
+              className="btn-sm justify-start"
               variant={`${
                 selectedCategory === "All" ? "btn-primary" : "btn-ghost"
               }`}
@@ -190,9 +193,9 @@ md:relative md:top-0 md:h-auto md:translate-x-0
               <Button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className = "btn-sm justify-start" 
+                className="btn-sm justify-start"
                 variant={`${
-                  selectedCategory === cat ?"btn-primary" :"btn-ghost"
+                  selectedCategory === cat ? "btn-primary" : "btn-ghost"
                 }`}
               >
                 <Folder size={16} />
@@ -226,37 +229,42 @@ md:relative md:top-0 md:h-auto md:translate-x-0
           {/* CATEGORY CARDS */}
           {categoryNames.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-8">
-              {categoryNames.map((cat) => (
-                <div
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className="card bg-base-100 shadow cursor-pointer hover:shadow-lg transition"
-                >
-                  <div className="card-body p-4">
-                    <div className="flex items-center gap-2 font-semibold">
-                      <Folder size={18} />
-                      {cat}
+              {categoryNames.map((cat) => {
+                const color = getCategoryColor(cat);
+                return (
+                  <div
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`card ${color.bg} ${color.border} border shadow cursor-pointer hover:shadow-lg transition`}
+                  >
+                    <div className="card-body p-4">
+                      <div className="flex items-center gap-2 font-semibold">
+                        <Folder size={18} />
+                        {cat}
+                      </div>
+
+                      <p className="text-sm text-base-content/70">
+                        {categories[cat].completed} / {categories[cat].total}{" "}
+                        completed
+                      </p>
+
+                      <progress
+                        className="progress progress-primary w-full"
+                        value={categories[cat].completed}
+                        max={categories[cat].total}
+                      />
                     </div>
-
-                    <p className="text-sm text-base-content/70">
-                      {categories[cat].completed} / {categories[cat].total}{" "}
-                      completed
-                    </p>
-
-                    <progress
-                      className="progress progress-primary w-full"
-                      value={categories[cat].completed}
-                      max={categories[cat].total}
-                    />
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
           {/* TODO GRID */}
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-            {filteredTodos.map((todo) => (
+            {filteredTodos.map((todo) => {
+              const color = todo.category ? getCategoryColor(todo.category) : null;
+              return(
               <div
                 key={todo._id}
                 className="card bg-base-100 shadow group hover:shadow-lg"
@@ -285,7 +293,7 @@ md:relative md:top-0 md:h-auto md:translate-x-0
                       </h6>
 
                       {todo.category && (
-                        <span className="badge badge-outline mt-2">
+                        <span className={`badge mt-2 ${color.bg} ${color.text} border ${color.border}`}>
                           {todo.category}
                         </span>
                       )}
@@ -293,7 +301,7 @@ md:relative md:top-0 md:h-auto md:translate-x-0
                   </div>
 
                   {/* /* HOVER ACTIONS* */}
-                  <div className="flex gap-2 mt-4 opacity-0 group-hover:opacity-100 transition">
+                  <div className="flex gap-2 mt-4 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition">
                     <Button
                       variant="btn-ghost"
                       className="btn-sm"
@@ -317,7 +325,8 @@ md:relative md:top-0 md:h-auto md:translate-x-0
                   </div>
                 </div>
               </div>
-            ))}
+              );
+})}
           </div>
         </main>
         <EditTodoModal

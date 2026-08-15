@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
-import  Button  from "../components/ui/Button";
+import Button from "../components/ui/Button";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -13,6 +13,7 @@ const LoginPage = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] =  useState("")
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -24,6 +25,7 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("")
 
     try {
       const response = await fetch(
@@ -47,7 +49,8 @@ const LoginPage = () => {
       navigate("/feed");
     } catch (error) {
       console.error(error);
-      //   alert(error.message);
+      setError(error.message)
+      // alert(error.message);
     } finally {
       setLoading(false);
     }
@@ -115,11 +118,15 @@ const LoginPage = () => {
             <Button
               type="submit"
               variant="btn-primary"
-              className={` w-full ${loading ? "loading" : ""}`}
+              className= "w-full"
             >
               Login
             </Button>
           </form>
+          {error && <p className="text-red-700 text-sm text-center font-medium">
+            {error||
+              "An error occurred"}
+          </p>}
 
           {/* Register Link */}
           <p className="text-center text-sm mt-4">
